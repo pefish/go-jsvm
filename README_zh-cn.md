@@ -18,7 +18,6 @@ go get github.com/pefish/go-jsvm/cmd/...
 go-jsvm ./test/test.js
 ```
 
-
 ## 文档
 
 [doc](https://godoc.org/github.com/pefish/go-jsvm)
