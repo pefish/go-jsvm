@@ -1,7 +1,7 @@
 package module
 
 import (
-	"regexp"
+	"github.com/dlclark/regexp2"
 )
 
 type Regex struct {
@@ -11,7 +11,11 @@ type Regex struct {
 func RegisterRegexModule(v IWrappedVm) error {
 	return v.RegisterModule("regex", &Regex{
 		Match: func(pattern string, targetStr string) bool {
-			bool_, err := regexp.Match(pattern, []byte(targetStr))
+			reg, err := regexp2.Compile(pattern, 0)
+			if err != nil {
+				panic(v.ToValue(err))
+			}
+			bool_, err := reg.MatchString(targetStr)
 			if err != nil {
 				panic(v.ToValue(err))
 			}
