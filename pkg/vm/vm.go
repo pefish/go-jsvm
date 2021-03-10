@@ -6,6 +6,8 @@ import (
 	"github.com/dop251/goja"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jsvm/pkg/vm/module"
+	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -24,6 +26,30 @@ func NewVmAndLoad(script string) (*WrappedVm, error) {
 	err = vm.Load()
 	if err != nil {
 		return nil, err
+	}
+	return vm, nil
+}
+
+func NewVmAndLoadWithFile(jsFilename string) (*WrappedVm, error) {
+	fileInfo, err := os.Stat(jsFilename)
+	if err != nil {
+		return nil, go_error.WithStack(err)
+	}
+	if fileInfo.IsDir() || !fileInfo.Mode().IsRegular() {
+		return nil, errors.New("illegal js file")
+	}
+	f, err := os.Open(jsFilename)
+	if err != nil {
+		return nil, go_error.WithStack(err)
+	}
+	defer f.Close()
+	content, err := ioutil.ReadAll(f)
+	if err != nil {
+		return nil, go_error.WithStack(err)
+	}
+	vm, err := NewVmAndLoad(string(content))
+	if err != nil {
+		return nil, go_error.WithStack(err)
 	}
 	return vm, nil
 }
