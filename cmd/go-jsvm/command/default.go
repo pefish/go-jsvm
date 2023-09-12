@@ -31,7 +31,7 @@ func (dc *DefaultCommand) Start(data *commander.StartData) error {
 	if !ok {
 		return errors.New("please set js file")
 	}
-	vm, err := vm2.NewVmAndLoadWithFile(jsFilename)
+	vm, err := vm2.NewVmWithFile(jsFilename)
 	if err != nil {
 		return err
 	}

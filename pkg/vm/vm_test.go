@@ -6,15 +6,15 @@ import (
 	"testing"
 )
 
-func TestNewVmAndLoad(t *testing.T) {
-	vm, err := NewVmAndLoad(`
+func TestNewVm(t *testing.T) {
+	vm, err := NewVm(`
 console.log("123")
 `)
 	test.Equal(t, nil, err)
 	_, err = vm.Run(nil)
-	test.Equal(t, true, err != nil && err.Error() == "function not be found")
+	test.Equal(t, true, err != nil && strings.Contains(err.Error(), "js function <main> not be found"))
 
-	vm1, err := NewVmAndLoad(`
+	vm1, err := NewVm(`
 function main(args) {
 console.log(args)
 return args
@@ -29,7 +29,7 @@ return args
 	test.Equal(t, "222", realResult[1].(string))
 	test.Equal(t, 123, realResult[2].(int))
 
-	vm2, err := NewVmAndLoad(`
+	vm2, err := NewVm(`
 function main(args) {
 	return regex.match(args[0], args[1])
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/dop251/goja"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jsvm/pkg/vm/module"
+	go_logger "github.com/pefish/go-logger"
 	"github.com/pkg/errors"
 	"io"
 	"os"
@@ -13,23 +14,41 @@ import (
 type WrappedVm struct {
 	Vm     *goja.Runtime
 	script string
+	logger go_logger.InterfaceLogger
 }
 
 type MainFuncType func([]interface{}) interface{}
 
-func NewVmAndLoad(script string) (*WrappedVm, error) {
-	vm, err := NewVm(script)
-	if err != nil {
-		return nil, err
-	}
-	err = vm.Load()
-	if err != nil {
-		return nil, err
-	}
-	return vm, nil
+func (v *WrappedVm) SetLogger(logger go_logger.InterfaceLogger) *WrappedVm {
+	v.logger = logger
+	return v
 }
 
-func NewVmAndLoadWithFile(jsFilename string) (*WrappedVm, error) {
+func (v *WrappedVm) Logger() go_logger.InterfaceLogger {
+	return v.logger
+}
+
+func NewVm(script string) (*WrappedVm, error) {
+	vm := goja.New()
+	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
+
+	wrappedVm := &WrappedVm{
+		Vm:     vm,
+		script: script,
+		logger: go_logger.Logger,
+	}
+	err := wrappedVm.registerModules()
+	if err != nil {
+		return nil, err
+	}
+	_, err = wrappedVm.Vm.RunString(script)
+	if err != nil {
+		return nil, err
+	}
+	return wrappedVm, nil
+}
+
+func NewVmWithFile(jsFilename string) (*WrappedVm, error) {
 	fileInfo, err := os.Stat(jsFilename)
 	if err != nil {
 		return nil, go_error.WithStack(err)
@@ -46,26 +65,11 @@ func NewVmAndLoadWithFile(jsFilename string) (*WrappedVm, error) {
 	if err != nil {
 		return nil, go_error.WithStack(err)
 	}
-	vm, err := NewVmAndLoad(string(content))
+	vm, err := NewVm(string(content))
 	if err != nil {
 		return nil, go_error.WithStack(err)
 	}
 	return vm, nil
-}
-
-func NewVm(script string) (*WrappedVm, error) {
-	vm := goja.New()
-	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
-
-	wrappedVm := &WrappedVm{
-		Vm:     vm,
-		script: script,
-	}
-	err := wrappedVm.registerModules()
-	if err != nil {
-		return nil, err
-	}
-	return wrappedVm, nil
 }
 
 // 注册预设的一些模块
@@ -94,21 +98,17 @@ func (v *WrappedVm) ToValue(i interface{}) goja.Value {
 	return v.Vm.ToValue(i)
 }
 
-// 执行脚本
-func (v *WrappedVm) Load() error {
-	_, err := v.Vm.RunString(v.script)
-	if err != nil {
-		return go_error.WithStack(err)
-	}
-	return nil
-}
-
 // 执行脚本中的 main 函数
 func (v *WrappedVm) Run(args []interface{}) (interface{}, error) {
 	return v.RunFunc("main", args)
 }
 
-func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interface{}, err error) {
+func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interface{}, err_ error) {
+	defer func() {
+		if err := recover(); err != nil {
+			err_ = errors.Errorf("function %s run failed - %s", funcName, err.(error).Error())
+		}
+	}()
 	if args == nil {
 		args = []interface{}{"undefined"} // 必须填充一个参数，否则编译报错。goja 的问题
 	}
@@ -117,14 +117,21 @@ func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interfa
 		return "", errors.Errorf("function %s run failed - %s", funcName, err.Error())
 	}
 
-	return mainFunc(args), nil
+	mainFuncResult := mainFunc(args) // panic when js throw
+	return mainFuncResult, nil
 }
 
-func (v *WrappedVm) findFunc(funcName string) (result MainFuncType, err error) {
+func (v *WrappedVm) findFunc(funcName string) (result MainFuncType, err_ error) {
+	defer func() {
+		if err := recover(); err != nil {
+			err_ = errors.Wrap(err.(error), fmt.Sprintf("js function <%s> not be found", funcName))
+		}
+	}()
 	var mainFunc MainFuncType
-	err = v.Vm.ExportTo(v.Vm.Get(funcName), &mainFunc)
+	jsFunc := v.Vm.Get(funcName) // panic when not found
+	err := v.Vm.ExportTo(jsFunc, &mainFunc)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("js function <%s> not be found", funcName))
+		return nil, errors.Wrap(err, fmt.Sprintf("export js function <%s> error", funcName))
 	}
 	return mainFunc, nil
 }
