@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"os"
-	"strings"
 )
 
 type WrappedVm struct {
@@ -110,39 +109,22 @@ func (v *WrappedVm) Run(args []interface{}) (interface{}, error) {
 }
 
 func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interface{}, err error) {
-	defer func() {
-		if recoverErr := recover(); recoverErr != nil {
-			if errTemp, ok := recoverErr.(error); ok {
-				err = errors.New(fmt.Sprintf("function %s run failed - %s", funcName, errTemp.Error()))
-			} else {
-				err = errors.New(fmt.Sprintf("function %s run failed", funcName))
-			}
-		}
-	}()
 	if args == nil {
 		args = []interface{}{"undefined"} // 必须填充一个参数，否则编译报错。goja 的问题
 	}
-	mainFunc, err := v.mustFindFunc(funcName)
+	mainFunc, err := v.findFunc(funcName)
 	if err != nil {
-		return "", go_error.WithStack(err)
+		return "", errors.Errorf("function %s run failed - %s", funcName, err.Error())
 	}
 
 	return mainFunc(args), nil
 }
 
-func (v *WrappedVm) mustFindFunc(funcName string) (result MainFuncType, err error) {
-	defer func() {
-		if recoverErr := recover(); recoverErr != nil {
-			if tempErr, ok := recoverErr.(error); ok && strings.Contains(tempErr.Error(), "invalid memory address or nil pointer dereference") {
-				err = go_error.WithStack(errors.New("function not be found"))
-				return
-			}
-		}
-	}()
+func (v *WrappedVm) findFunc(funcName string) (result MainFuncType, err error) {
 	var mainFunc MainFuncType
 	err = v.Vm.ExportTo(v.Vm.Get(funcName), &mainFunc)
 	if err != nil {
-		return nil, go_error.WithStack(err)
+		return nil, errors.Wrap(err, fmt.Sprintf("js function <%s> not be found", funcName))
 	}
 	return mainFunc, nil
 }
