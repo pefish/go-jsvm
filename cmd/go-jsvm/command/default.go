@@ -8,13 +8,10 @@ import (
 )
 
 type DefaultCommand struct {
-
 }
 
 func NewDefaultCommand() *DefaultCommand {
-	return &DefaultCommand{
-
-	}
+	return &DefaultCommand{}
 }
 
 func (dc *DefaultCommand) DecorateFlagSet(flagSet *flag.FlagSet) error {
@@ -25,11 +22,15 @@ func (dc *DefaultCommand) OnExited(data *commander.StartData) error {
 	return nil
 }
 
+func (dc *DefaultCommand) Init(data *commander.StartData) error {
+	return nil
+}
+
 func (dc *DefaultCommand) Start(data *commander.StartData) error {
-	if len(data.Args) == 0 {
+	jsFilename, ok := data.Args["js file"]
+	if !ok {
 		return errors.New("please set js file")
 	}
-	jsFilename := data.Args[0]
 	vm, err := vm2.NewVmAndLoadWithFile(jsFilename)
 	if err != nil {
 		return err
@@ -40,4 +41,3 @@ func (dc *DefaultCommand) Start(data *commander.StartData) error {
 	}
 	return nil
 }
-

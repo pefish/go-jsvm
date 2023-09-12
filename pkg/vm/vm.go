@@ -1,18 +1,18 @@
 package vm
 
 import (
-	"github.com/pkg/errors"
 	"fmt"
 	"github.com/dop251/goja"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jsvm/pkg/vm/module"
-	"io/ioutil"
+	"github.com/pkg/errors"
+	"io"
 	"os"
 	"strings"
 )
 
 type WrappedVm struct {
-	Vm *goja.Runtime
+	Vm     *goja.Runtime
 	script string
 }
 
@@ -43,7 +43,7 @@ func NewVmAndLoadWithFile(jsFilename string) (*WrappedVm, error) {
 		return nil, go_error.WithStack(err)
 	}
 	defer f.Close()
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return nil, go_error.WithStack(err)
 	}
@@ -59,7 +59,7 @@ func NewVm(script string) (*WrappedVm, error) {
 	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
 
 	wrappedVm := &WrappedVm{
-		Vm: vm,
+		Vm:     vm,
 		script: script,
 	}
 	err := wrappedVm.registerModules()
@@ -120,7 +120,7 @@ func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interfa
 		}
 	}()
 	if args == nil {
-		args = []interface{}{"undefined"}  // 必须填充一个参数，否则编译报错。goja 的问题
+		args = []interface{}{"undefined"} // 必须填充一个参数，否则编译报错。goja 的问题
 	}
 	mainFunc, err := v.mustFindFunc(funcName)
 	if err != nil {
@@ -146,4 +146,3 @@ func (v *WrappedVm) mustFindFunc(funcName string) (result MainFuncType, err erro
 	}
 	return mainFunc, nil
 }
-

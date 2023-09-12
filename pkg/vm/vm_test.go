@@ -1,7 +1,7 @@
 package vm
 
 import (
-	"github.com/pefish/go-test-assert"
+	"github.com/pefish/go-test"
 	"strings"
 	"testing"
 )
@@ -21,7 +21,7 @@ return args
 }
 `)
 	test.Equal(t, nil, err)
-	result, err := vm1.Run([]interface{}{"111","222", 123})
+	result, err := vm1.Run([]interface{}{"111", "222", 123})
 	test.Equal(t, nil, err)
 	realResult, ok := result.([]interface{})
 	test.Equal(t, true, ok)
@@ -35,10 +35,10 @@ function main(args) {
 }
 `)
 	test.Equal(t, nil, err)
-	_, err = vm2.Run([]interface{}{"*","222"})
+	_, err = vm2.Run([]interface{}{"*", "222"})
 	test.Equal(t, true, err != nil && strings.Contains(err.Error(), "function main run failed - error parsing regexp: missing argument to repetition operator"))
 
-	result21, err := vm2.Run([]interface{}{".*","222"})
+	result21, err := vm2.Run([]interface{}{".*", "222"})
 	test.Equal(t, nil, err)
 	realResult21, ok := result21.(bool)
 	test.Equal(t, true, ok)
