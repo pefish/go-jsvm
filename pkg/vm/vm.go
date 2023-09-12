@@ -74,11 +74,12 @@ func NewVmWithFile(jsFilename string) (*WrappedVm, error) {
 
 // 注册预设的一些模块
 func (v *WrappedVm) registerModules() error {
-	err := module.RegisterConsoleModule(v)
+	err := v.RegisterModule("console", module.NewConsoleModule(v))
 	if err != nil {
 		return err
 	}
-	err = module.RegisterRegexModule(v)
+
+	err = v.RegisterModule("regex", module.NewRegexModule(v))
 	if err != nil {
 		return err
 	}

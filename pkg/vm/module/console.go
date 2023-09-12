@@ -1,13 +1,15 @@
 package module
 
 type Console struct {
-	Log func(data ...interface{}) `json:"log"`
+	vm IWrappedVm
 }
 
-func RegisterConsoleModule(v IWrappedVm) error {
-	return v.RegisterModule("console", &Console{
-		Log: func(data ...interface{}) {
-			v.Logger().Info(data...)
-		},
-	})
+func (c *Console) Log(data ...interface{}) {
+	c.vm.Logger().Info(data...)
+}
+
+func NewConsoleModule(vm IWrappedVm) *Console {
+	return &Console{
+		vm: vm,
+	}
 }

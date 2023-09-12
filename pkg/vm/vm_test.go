@@ -43,4 +43,5 @@ function main(args) {
 	realResult21, ok := result21.(bool)
 	test.Equal(t, true, ok)
 	test.Equal(t, true, realResult21)
+
 }
