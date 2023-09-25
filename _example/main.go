@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/pefish/go-jsvm/pkg/vm"
-	"go-jsvm/_example/module"
+	vm "github.com/pefish/go-jsvm"
+	"github.com/pefish/go-jsvm/_example/module"
 	"log"
 	"time"
 )

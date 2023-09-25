@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/dop251/goja"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-jsvm/pkg/vm/module"
+	"github.com/pefish/go-jsvm/module"
 	go_logger "github.com/pefish/go-logger"
 	"github.com/pkg/errors"
 	"io"

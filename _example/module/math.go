@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/pefish/go-jsvm/pkg/vm/module"
+	"github.com/pefish/go-jsvm/module"
 	"math"
 )
 

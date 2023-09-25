@@ -1,4 +1,4 @@
-module go-jsvm
+module github.com/pefish/go-jsvm
 
 go 1.20
 
@@ -6,7 +6,6 @@ require (
 	github.com/dlclark/regexp2 v1.10.0
 	github.com/dop251/goja v0.0.0-20230919151941-fc55792775de
 	github.com/pefish/go-error v1.0.7
-	github.com/pefish/go-jsvm v0.1.3
 	github.com/pefish/go-logger v0.5.2
 	github.com/pefish/go-test v0.0.3
 	github.com/pkg/errors v0.9.1
