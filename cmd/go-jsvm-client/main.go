@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/pefish/go-commander"
-	"github.com/pefish/go-jsvm/cmd/go-jsvm/command"
-	"github.com/pefish/go-jsvm/version"
+	"github.com/pefish/go-jsvm-client/cmd/go-jsvm-client/command"
+	"github.com/pefish/go-jsvm-client/version"
 	go_logger "github.com/pefish/go-logger"
 )
 

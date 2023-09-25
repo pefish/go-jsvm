@@ -3,7 +3,7 @@ package command
 import (
 	"flag"
 	"github.com/pefish/go-commander"
-	vm2 "github.com/pefish/go-jsvm/pkg/vm"
+	vm "github.com/pefish/go-jsvm"
 	"github.com/pkg/errors"
 )
 
@@ -31,11 +31,11 @@ func (dc *DefaultCommand) Start(data *commander.StartData) error {
 	if !ok {
 		return errors.New("please set js file")
 	}
-	vm, err := vm2.NewVmWithFile(jsFilename)
+	wrappedVm, err := vm.NewVmWithFile(jsFilename)
 	if err != nil {
 		return err
 	}
-	_, err = vm.Run(nil)
+	_, err = wrappedVm.Run(nil)
 	if err != nil {
 		return err
 	}
