@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "github.com/dop251/goja_nodejs/console"
 	vm "github.com/pefish/go-jsvm"
-	"github.com/pefish/go-jsvm/_example/module"
 	"log"
 	"time"
 )
@@ -16,14 +16,11 @@ func main() {
 
 func do() error {
 	wrappedVm, err := vm.NewVm(`
-function main() {
-  console.log(math.abs(-1))
-}
-`)
-	if err != nil {
-		return err
+	function main() {
+		var m = require("./m.js");
+		m.test();
 	}
-	err = wrappedVm.RegisterModule("math", module.NewMathModule(wrappedVm))
+	`)
 	if err != nil {
 		return err
 	}

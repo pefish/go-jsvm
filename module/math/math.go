@@ -1,9 +1,11 @@
-package module
+package math
 
 import (
 	"github.com/pefish/go-jsvm/module"
 	"math"
 )
+
+const ModuleName = "Math"
 
 type Math struct {
 	vm module.IWrappedVm

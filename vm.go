@@ -3,8 +3,13 @@ package vm
 import (
 	"fmt"
 	"github.com/dop251/goja"
-	"github.com/pefish/go-error"
-	"github.com/pefish/go-jsvm/module"
+	"github.com/dop251/goja_nodejs/buffer"
+	"github.com/dop251/goja_nodejs/console"
+	"github.com/dop251/goja_nodejs/process"
+	"github.com/dop251/goja_nodejs/require"
+	"github.com/dop251/goja_nodejs/url"
+	"github.com/pefish/go-jsvm/module/math"
+	"github.com/pefish/go-jsvm/module/regex"
 	go_logger "github.com/pefish/go-logger"
 	"github.com/pkg/errors"
 	"io"
@@ -29,6 +34,7 @@ func (v *WrappedVm) Logger() go_logger.InterfaceLogger {
 }
 
 func NewVm(script string) (*WrappedVm, error) {
+
 	vm := goja.New()
 	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
 
@@ -51,35 +57,41 @@ func NewVm(script string) (*WrappedVm, error) {
 func NewVmWithFile(jsFilename string) (*WrappedVm, error) {
 	fileInfo, err := os.Stat(jsFilename)
 	if err != nil {
-		return nil, go_error.WithStack(err)
+		return nil, err
 	}
 	if fileInfo.IsDir() || !fileInfo.Mode().IsRegular() {
 		return nil, errors.New("illegal js file")
 	}
 	f, err := os.Open(jsFilename)
 	if err != nil {
-		return nil, go_error.WithStack(err)
+		return nil, err
 	}
 	defer f.Close()
 	content, err := io.ReadAll(f)
 	if err != nil {
-		return nil, go_error.WithStack(err)
+		return nil, err
 	}
 	vm, err := NewVm(string(content))
 	if err != nil {
-		return nil, go_error.WithStack(err)
+		return nil, err
 	}
 	return vm, nil
 }
 
 // 注册预设的一些模块
 func (v *WrappedVm) registerModules() error {
-	err := v.RegisterModule("console", module.NewConsoleModule(v))
+	new(require.Registry).Enable(v.Vm)
+	console.Enable(v.Vm)
+	buffer.Enable(v.Vm)
+	process.Enable(v.Vm)
+	url.Enable(v.Vm)
+
+	err := v.RegisterModule(regex.ModuleName, regex.NewRegexModule(v))
 	if err != nil {
 		return err
 	}
 
-	err = v.RegisterModule("regex", module.NewRegexModule(v))
+	err = v.RegisterModule(math.ModuleName, math.NewMathModule(v))
 	if err != nil {
 		return err
 	}
@@ -90,7 +102,7 @@ func (v *WrappedVm) registerModules() error {
 func (v *WrappedVm) RegisterModule(moduleName string, module interface{}) error {
 	err := v.Vm.Set(moduleName, module)
 	if err != nil {
-		return go_error.WithStack(err)
+		return err
 	}
 	return nil
 }

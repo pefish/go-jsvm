@@ -1,11 +1,14 @@
-package module
+package regex
 
 import (
 	"github.com/dlclark/regexp2"
+	"github.com/pefish/go-jsvm/module"
 )
 
+const ModuleName = "regex"
+
 type Regex struct {
-	vm IWrappedVm
+	vm module.IWrappedVm
 }
 
 func (r *Regex) Match(pattern string, targetStr string) bool {
@@ -20,7 +23,7 @@ func (r *Regex) Match(pattern string, targetStr string) bool {
 	return bool_
 }
 
-func NewRegexModule(vm IWrappedVm) *Regex {
+func NewRegexModule(vm module.IWrappedVm) *Regex {
 	return &Regex{
 		vm: vm,
 	}
