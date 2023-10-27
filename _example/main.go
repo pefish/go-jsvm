@@ -15,18 +15,13 @@ func main() {
 }
 
 func do() error {
-	wrappedVm, err := vm.NewVm(`
-	function main() {
-		var m = require("./m.js");
-		m.test();
-	}
-	`)
+	wrappedVm, err := vm.NewVmWithFile("./main.js")
 	if err != nil {
 		return err
 	}
 
 	for {
-		_, err := wrappedVm.Run(nil)
+		_, err := wrappedVm.Run()
 		if err != nil {
 			return err
 		}

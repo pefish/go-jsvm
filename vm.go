@@ -47,10 +47,6 @@ func NewVm(script string) (*WrappedVm, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = wrappedVm.Vm.RunString(script)
-	if err != nil {
-		return nil, err
-	}
 	return wrappedVm, nil
 }
 
@@ -111,9 +107,12 @@ func (v *WrappedVm) ToValue(i interface{}) goja.Value {
 	return v.Vm.ToValue(i)
 }
 
-// 执行脚本中的 main 函数
-func (v *WrappedVm) Run(args []interface{}) (interface{}, error) {
+func (v *WrappedVm) RunMain(args []interface{}) (interface{}, error) {
 	return v.RunFunc("main", args)
+}
+
+func (v *WrappedVm) Run() (goja.Value, error) {
+	return v.Vm.RunString(v.script)
 }
 
 func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interface{}, err_ error) {
