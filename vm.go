@@ -111,6 +111,10 @@ func (v *WrappedVm) Panic(err error) {
 	panic(v.ToValue(fmt.Sprintf("%+v", err)))
 }
 
+func (v *WrappedVm) PanicWithMsg(msg string) {
+	panic(v.ToValue(fmt.Sprintf("%+v", errors.New(msg))))
+}
+
 func (v *WrappedVm) RunMain(args []interface{}) (interface{}, error) {
 	return v.RunFunc("main", args)
 }

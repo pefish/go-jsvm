@@ -10,4 +10,5 @@ type IWrappedVm interface {
 	ToValue(i interface{}) goja.Value
 	Logger() go_logger.InterfaceLogger
 	Panic(err error)
+	PanicWithMsg(msg string)
 }
