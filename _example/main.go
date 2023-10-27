@@ -3,6 +3,7 @@ package main
 import (
 	_ "github.com/dop251/goja_nodejs/console"
 	vm "github.com/pefish/go-jsvm"
+	"github.com/pefish/go-jsvm/_example/module/test_module"
 	"log"
 	"time"
 )
@@ -16,6 +17,11 @@ func main() {
 
 func do() error {
 	wrappedVm, err := vm.NewVmWithFile("./main.js")
+	if err != nil {
+		return err
+	}
+
+	err = wrappedVm.RegisterModule(test_module.ModuleName, test_module.NewTestModuleModule(wrappedVm))
 	if err != nil {
 		return err
 	}

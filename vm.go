@@ -107,6 +107,10 @@ func (v *WrappedVm) ToValue(i interface{}) goja.Value {
 	return v.Vm.ToValue(i)
 }
 
+func (v *WrappedVm) Panic(err error) {
+	panic(v.ToValue(fmt.Sprintf("%+v", err)))
+}
+
 func (v *WrappedVm) RunMain(args []interface{}) (interface{}, error) {
 	return v.RunFunc("main", args)
 }

@@ -9,4 +9,5 @@ type IWrappedVm interface {
 	RegisterModule(moduleName string, module interface{}) error
 	ToValue(i interface{}) goja.Value
 	Logger() go_logger.InterfaceLogger
+	Panic(err error)
 }

@@ -19,6 +19,18 @@ function main() {
     console.log(currency, currencyConfig)
   }
 
+  test_module.test()
+
+  try {
+    test_module.testPanic()
+  } catch (err) {
+    console.log(err)
+  }
+
+  console.log(test_module.testPtr().a)
+
+  console.log(test_module.testNull() === null)
+
 }
 
 main()
