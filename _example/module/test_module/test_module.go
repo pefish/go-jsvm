@@ -3,6 +3,7 @@ package test_module
 import (
 	"fmt"
 	"github.com/pefish/go-jsvm/module"
+	"github.com/pkg/errors"
 )
 
 const ModuleName = "test_module"
@@ -16,7 +17,8 @@ func (t *TestModule) Test() {
 }
 
 func (t *TestModule) TestPanic() {
-	t.vm.PanicWithMsg("test panic")
+	//t.vm.PanicWithMsg("test panic")
+	t.vm.Panic(errors.New("test panic"))
 }
 
 type TestObj struct {
