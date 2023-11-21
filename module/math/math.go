@@ -27,6 +27,34 @@ func (c *Math) Average(values []float64) float64 {
 	return sum / float64(count)
 }
 
+func (c *Math) Max(datas []float64) float64 {
+	result := datas[0]
+	for i := 1; i < len(datas); i++ {
+		if math.IsNaN(result) {
+			result = datas[i]
+			continue
+		}
+		if !math.IsNaN(datas[i]) && datas[i] > result {
+			result = datas[i]
+		}
+	}
+	return result
+}
+
+func (c *Math) Min(datas []float64) float64 {
+	result := datas[0]
+	for i := 1; i < len(datas); i++ {
+		if math.IsNaN(result) {
+			result = datas[i]
+			continue
+		}
+		if !math.IsNaN(datas[i]) && datas[i] < result {
+			result = datas[i]
+		}
+	}
+	return result
+}
+
 func NewMathModule(vm module.IWrappedVm) *Math {
 	return &Math{
 		vm: vm,
