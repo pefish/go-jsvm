@@ -16,18 +16,20 @@ func main() {
 }
 
 func do() error {
-
 	for {
 		wrappedVm, err := vm.NewVmWithFile("./main.js")
 		if err != nil {
 			return err
 		}
-
 		err = wrappedVm.RegisterModule(test_module.ModuleName, test_module.NewTestModuleModule(wrappedVm))
 		if err != nil {
 			return err
 		}
 		_, err = wrappedVm.Run()
+		if err != nil {
+			return err
+		}
+		_, err = wrappedVm.RunMain(nil)
 		if err != nil {
 			return err
 		}
