@@ -31,9 +31,13 @@ function main() {
 
   console.log(test_module.testNull() === null)
 
-  console.log(Math.average([1,2,3]))
+  const func = () => {
+    console.log(Math.average([1,2,3]))
 
-  console.log(["a", "b", "c"].reverse())
+    console.log(["a", "b", "c"].reverse())
+  }
+
+  func()
 }
 
 main()
