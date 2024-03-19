@@ -2,6 +2,9 @@ package vm
 
 import (
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/buffer"
 	"github.com/dop251/goja_nodejs/console"
@@ -12,8 +15,6 @@ import (
 	"github.com/pefish/go-jsvm/module/regex"
 	go_logger "github.com/pefish/go-logger"
 	"github.com/pkg/errors"
-	"io"
-	"os"
 )
 
 type WrappedVm struct {
@@ -108,11 +109,23 @@ func (v *WrappedVm) ToValue(i interface{}) goja.Value {
 }
 
 func (v *WrappedVm) Panic(err error) {
-	panic(v.ToValue(fmt.Sprintf("%+v", err)))
+	panic(
+		v.ToValue(
+			map[string]string{
+				"message": fmt.Sprintf("%+v", err),
+			},
+		),
+	)
 }
 
 func (v *WrappedVm) PanicWithMsg(msg string) {
-	panic(v.ToValue(fmt.Sprintf("%+v", errors.New(msg))))
+	panic(
+		v.ToValue(
+			map[string]string{
+				"message": fmt.Sprintf("%+v", errors.New(msg)),
+			},
+		),
+	)
 }
 
 func (v *WrappedVm) RunMain(args []interface{}) (interface{}, error) {

@@ -24,7 +24,7 @@ function main() {
   try {
     test_module.testPanic()
   } catch (err) {
-    console.log(err)
+    console.log("error: ", err.message)
   }
 
   console.log(test_module.testPtr().a)
