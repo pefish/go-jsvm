@@ -16,7 +16,7 @@ function main() {
   }
 
   for (const [currency, currencyConfig] of Object.entries(currencyConfigs)) {
-    console.log(currency, currencyConfig)
+    console.log(currency, JSON.stringify(currencyConfig))
   }
 
   test_module.test()
@@ -38,6 +38,16 @@ function main() {
   }
 
   func()
+
+  // throw(new Error("test throw"))
+
+  // try {
+  //   test_module.testPanic()
+  // } catch (err) {
+  //   throw(new Error(err.message))
+  // }
+
+  throw({message: "err"})  // 如果 throw 一个 object，则 go 那边收到的 [object Object]
 }
 
 main()

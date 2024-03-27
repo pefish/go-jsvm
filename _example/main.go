@@ -1,17 +1,18 @@
 package main
 
 import (
+	"time"
+
 	_ "github.com/dop251/goja_nodejs/console"
 	vm "github.com/pefish/go-jsvm"
 	"github.com/pefish/go-jsvm/_example/module/test_module"
-	"log"
-	"time"
+	go_logger "github.com/pefish/go-logger"
 )
 
 func main() {
 	err := do()
 	if err != nil {
-		log.Fatal(err)
+		go_logger.Logger.Error(err)
 	}
 }
 
