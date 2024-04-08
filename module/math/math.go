@@ -1,14 +1,21 @@
 package math
 
 import (
-	"github.com/pefish/go-jsvm/module"
 	"math"
+
+	"github.com/pefish/go-jsvm/module"
 )
 
 const ModuleName = "Math"
 
 type Math struct {
 	vm module.IWrappedVm
+}
+
+func NewMathModule(vm module.IWrappedVm) *Math {
+	return &Math{
+		vm: vm,
+	}
 }
 
 func (c *Math) Abs(a float64) float64 {
@@ -53,10 +60,4 @@ func (c *Math) Min(datas []float64) float64 {
 		}
 	}
 	return result
-}
-
-func NewMathModule(vm module.IWrappedVm) *Math {
-	return &Math{
-		vm: vm,
-	}
 }

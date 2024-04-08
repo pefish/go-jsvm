@@ -11,6 +11,12 @@ type Regex struct {
 	vm module.IWrappedVm
 }
 
+func NewRegexModule(vm module.IWrappedVm) *Regex {
+	return &Regex{
+		vm: vm,
+	}
+}
+
 func (r *Regex) Match(pattern string, targetStr string) bool {
 	reg, err := regexp2.Compile(pattern, 0)
 	if err != nil {
@@ -21,10 +27,4 @@ func (r *Regex) Match(pattern string, targetStr string) bool {
 		panic(r.vm.ToValue(err))
 	}
 	return bool_
-}
-
-func NewRegexModule(vm module.IWrappedVm) *Regex {
-	return &Regex{
-		vm: vm,
-	}
 }

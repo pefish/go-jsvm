@@ -13,6 +13,7 @@ import (
 	"github.com/dop251/goja_nodejs/url"
 	"github.com/pefish/go-jsvm/module/math"
 	"github.com/pefish/go-jsvm/module/regex"
+	"github.com/pefish/go-jsvm/module/time"
 	go_logger "github.com/pefish/go-logger"
 	"github.com/pkg/errors"
 )
@@ -89,6 +90,11 @@ func (v *WrappedVm) registerModules() error {
 	}
 
 	err = v.RegisterModule(math.ModuleName, math.NewMathModule(v))
+	if err != nil {
+		return err
+	}
+
+	err = v.RegisterModule(time.ModuleName, time.NewTimeModule(v))
 	if err != nil {
 		return err
 	}
