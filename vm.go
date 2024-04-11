@@ -93,6 +93,10 @@ func (v *WrappedVm) registerModules() error {
 	if err != nil {
 		return err
 	}
+	err = v.RegisterModule(math.ModuleName1, math.NewMathModule(v))
+	if err != nil {
+		return err
+	}
 
 	err = v.RegisterModule(time.ModuleName, time.NewTimeModule(v))
 	if err != nil {

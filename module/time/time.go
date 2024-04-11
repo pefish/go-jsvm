@@ -6,7 +6,7 @@ import (
 	"github.com/pefish/go-jsvm/module"
 )
 
-const ModuleName = "time"
+const ModuleName = "time_go"
 
 type Time struct {
 	vm module.IWrappedVm

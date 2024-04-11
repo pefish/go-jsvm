@@ -7,6 +7,7 @@ import (
 )
 
 const ModuleName = "Math"
+const ModuleName1 = "math_go"
 
 type Math struct {
 	vm module.IWrappedVm

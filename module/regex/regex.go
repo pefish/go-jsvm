@@ -5,7 +5,7 @@ import (
 	"github.com/pefish/go-jsvm/module"
 )
 
-const ModuleName = "regex"
+const ModuleName = "regex_go"
 
 type Regex struct {
 	vm module.IWrappedVm
