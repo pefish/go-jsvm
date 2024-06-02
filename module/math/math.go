@@ -35,7 +35,7 @@ func (c *Math) Average(values []float64) float64 {
 	return sum / float64(count)
 }
 
-func (c *Math) Max(datas []float64) float64 {
+func (c *Math) Max(datas ...float64) float64 {
 	result := datas[0]
 	for i := 1; i < len(datas); i++ {
 		if math.IsNaN(result) {
@@ -49,7 +49,7 @@ func (c *Math) Max(datas []float64) float64 {
 	return result
 }
 
-func (c *Math) Min(datas []float64) float64 {
+func (c *Math) Min(datas ...float64) float64 {
 	result := datas[0]
 	for i := 1; i < len(datas); i++ {
 		if math.IsNaN(result) {

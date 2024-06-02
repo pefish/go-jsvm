@@ -6,6 +6,8 @@ function main() {
   console.log(isNaN(1))
   console.log(isNaN(NaN))
 
+  console.log(Math.max(3,4,1))
+
   const currencyConfigs = {
     "TRB": {
       BOLL: [72, 3]
