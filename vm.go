@@ -7,10 +7,11 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/buffer"
-	"github.com/dop251/goja_nodejs/console"
 	"github.com/dop251/goja_nodejs/process"
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/dop251/goja_nodejs/url"
+	"github.com/pefish/go-jsvm/module/console"
+	"github.com/pefish/go-jsvm/module/http"
 	"github.com/pefish/go-jsvm/module/math"
 	"github.com/pefish/go-jsvm/module/regex"
 	"github.com/pefish/go-jsvm/module/time"
@@ -55,19 +56,19 @@ func NewVm(script string) (*WrappedVm, error) {
 func NewVmWithFile(jsFilename string) (*WrappedVm, error) {
 	fileInfo, err := os.Stat(jsFilename)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Illegal js file <%s>.", jsFilename)
 	}
 	if fileInfo.IsDir() || !fileInfo.Mode().IsRegular() {
-		return nil, errors.New("illegal js file")
+		return nil, errors.Errorf("Illegal js file <%s>.", jsFilename)
 	}
 	f, err := os.Open(jsFilename)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Illegal js file <%s>.", jsFilename)
 	}
 	defer f.Close()
 	content, err := io.ReadAll(f)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Illegal js file <%s>.", jsFilename)
 	}
 	vm, err := NewVm(string(content))
 	if err != nil {
@@ -79,7 +80,6 @@ func NewVmWithFile(jsFilename string) (*WrappedVm, error) {
 // 注册预设的一些模块
 func (v *WrappedVm) registerModules() error {
 	new(require.Registry).Enable(v.Vm)
-	console.Enable(v.Vm)
 	buffer.Enable(v.Vm)
 	process.Enable(v.Vm)
 	url.Enable(v.Vm)
@@ -103,13 +103,27 @@ func (v *WrappedVm) registerModules() error {
 		return err
 	}
 
+	err = v.RegisterModule(http.ModuleName, http.NewHttpModule(v))
+	if err != nil {
+		return err
+	}
+
+	err = v.RegisterModule(console.ModuleName, console.NewConsoleModule(v))
+	if err != nil {
+		return err
+	}
+	err = v.RegisterModule(console.ModuleName1, console.NewConsoleModule(v))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (v *WrappedVm) RegisterModule(moduleName string, module interface{}) error {
 	err := v.Vm.Set(moduleName, module)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "Register module <%s> error.", moduleName)
 	}
 	return nil
 }
@@ -143,13 +157,17 @@ func (v *WrappedVm) RunMain(args []interface{}) (interface{}, error) {
 }
 
 func (v *WrappedVm) Run() (goja.Value, error) {
-	return v.Vm.RunString(v.script)
+	value, err := v.Vm.RunString(v.script)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Run script error.")
+	}
+	return value, nil
 }
 
 func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interface{}, err_ error) {
 	defer func() {
 		if err := recover(); err != nil {
-			err_ = errors.Errorf("function %s run failed - %s", funcName, err.(error).Error())
+			err_ = errors.Errorf("Function %s run failed - %s", funcName, err.(error).Error())
 		}
 	}()
 	if args == nil {
@@ -157,7 +175,7 @@ func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interfa
 	}
 	mainFunc, err := v.findFunc(funcName)
 	if err != nil {
-		return "", errors.Errorf("function %s run failed - %s", funcName, err.Error())
+		return "", errors.Errorf("Function %s run failed - %s", funcName, err.Error())
 	}
 
 	mainFuncResult := mainFunc(args) // panic when js throw
@@ -167,14 +185,14 @@ func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interfa
 func (v *WrappedVm) findFunc(funcName string) (result MainFuncType, err_ error) {
 	defer func() {
 		if err := recover(); err != nil {
-			err_ = errors.Wrap(err.(error), fmt.Sprintf("js function <%s> not be found", funcName))
+			err_ = errors.Wrap(err.(error), fmt.Sprintf("Js function <%s> not be found", funcName))
 		}
 	}()
 	var mainFunc MainFuncType
 	jsFunc := v.Vm.Get(funcName) // panic when not found
 	err := v.Vm.ExportTo(jsFunc, &mainFunc)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("export js function <%s> error", funcName))
+		return nil, errors.Wrapf(err, "Export js function <%s> error", funcName)
 	}
 	return mainFunc, nil
 }

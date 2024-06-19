@@ -21,3 +21,14 @@ func NewTimeModule(vm module.IWrappedVm) *Time {
 func (c *Time) Sleep(seconds int) {
 	time.Sleep(time.Duration(seconds) * time.Second)
 }
+
+func (c *Time) SetInterval(seconds int, func_ func() bool) {
+	timer := time.NewTimer(0)
+	for range timer.C {
+		exit := func_()
+		if exit {
+			return
+		}
+		timer.Reset(time.Duration(seconds) * time.Second)
+	}
+}

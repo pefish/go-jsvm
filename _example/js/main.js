@@ -1,4 +1,4 @@
-const m = require("./m.js");
+const m = require("./_example/js/m.js");
 
 function main() {
   m.test();
@@ -33,7 +33,7 @@ function main() {
 
   console.log(test_module.testNull() === null)
 
-  time.sleep(3)
+  time_go.sleep(1)
 
   const func = () => {
     console.log(Math.average([1,2,3]))
