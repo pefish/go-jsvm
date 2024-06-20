@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	_ "github.com/dop251/goja_nodejs/console"
 	vm "github.com/pefish/go-jsvm"
@@ -28,6 +29,12 @@ func do() error {
 	if err != nil {
 		return err
 	}
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		wrappedVm.Kill()
+	}()
+
 	_, err = wrappedVm.Run()
 	if err != nil {
 		return err

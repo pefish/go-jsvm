@@ -164,6 +164,10 @@ func (v *WrappedVm) Run() (goja.Value, error) {
 	return value, nil
 }
 
+func (v *WrappedVm) Kill() {
+	v.Vm.Interrupt("Killed")
+}
+
 func (v *WrappedVm) RunFunc(funcName string, args []interface{}) (result interface{}, err_ error) {
 	defer func() {
 		if err := recover(); err != nil {
