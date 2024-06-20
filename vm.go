@@ -39,8 +39,7 @@ func (v *WrappedVm) Logger() go_logger.InterfaceLogger {
 	return v.logger
 }
 
-func NewVm(script string) (*WrappedVm, error) {
-
+func NewVm(script string) *WrappedVm {
 	vm := goja.New()
 	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
 
@@ -49,11 +48,8 @@ func NewVm(script string) (*WrappedVm, error) {
 		script: script,
 		logger: go_logger.Logger,
 	}
-	err := wrappedVm.registerModules()
-	if err != nil {
-		return nil, err
-	}
-	return wrappedVm, nil
+	wrappedVm.registerModules()
+	return wrappedVm
 }
 
 func NewVmWithFile(jsFilename string) (*WrappedVm, error) {
@@ -73,54 +69,27 @@ func NewVmWithFile(jsFilename string) (*WrappedVm, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "Illegal js file <%s>.", jsFilename)
 	}
-	vm, err := NewVm(string(content))
-	if err != nil {
-		return nil, err
-	}
-	return vm, nil
+	return NewVm(string(content)), nil
 }
 
 // 注册预设的一些模块
-func (v *WrappedVm) registerModules() error {
+func (v *WrappedVm) registerModules() {
 	new(require.Registry).Enable(v.Vm)
 	buffer.Enable(v.Vm)
 	process.Enable(v.Vm)
 	url.Enable(v.Vm)
 
-	err := v.RegisterModule(regex.ModuleName, regex.NewRegexModule(v))
-	if err != nil {
-		return err
-	}
+	v.RegisterModule(regex.ModuleName, regex.NewRegexModule(v))
 
-	err = v.RegisterModule(math.ModuleName, math.NewMathModule(v))
-	if err != nil {
-		return err
-	}
-	err = v.RegisterModule(math.ModuleName1, math.NewMathModule(v))
-	if err != nil {
-		return err
-	}
+	v.RegisterModule(math.ModuleName, math.NewMathModule(v))
+	v.RegisterModule(math.ModuleName1, math.NewMathModule(v))
 
-	err = v.RegisterModule(time.ModuleName, time.NewTimeModule(v))
-	if err != nil {
-		return err
-	}
+	v.RegisterModule(time.ModuleName, time.NewTimeModule(v))
 
-	err = v.RegisterModule(http.ModuleName, http.NewHttpModule(v))
-	if err != nil {
-		return err
-	}
+	v.RegisterModule(http.ModuleName, http.NewHttpModule(v))
 
-	err = v.RegisterModule(console.ModuleName, console.NewConsoleModule(v))
-	if err != nil {
-		return err
-	}
-	err = v.RegisterModule(console.ModuleName1, console.NewConsoleModule(v))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	v.RegisterModule(console.ModuleName, console.NewConsoleModule(v))
+	v.RegisterModule(console.ModuleName1, console.NewConsoleModule(v))
 }
 
 func (v *WrappedVm) RegisterModule(moduleName string, module interface{}) error {
