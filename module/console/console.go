@@ -8,7 +8,8 @@ const ModuleName = "console"
 const ModuleName1 = "console_go"
 
 type Console struct {
-	vm module.IWrappedVm
+	vm       module.IWrappedVm
+	hookFunc func(data ...interface{})
 }
 
 func NewConsoleModule(vm module.IWrappedVm) *Console {
@@ -17,38 +18,14 @@ func NewConsoleModule(vm module.IWrappedVm) *Console {
 	}
 }
 
+func (c *Console) SetHookFunc(func_ func(data ...interface{})) {
+	c.hookFunc = func_
+}
+
 func (c *Console) Log(data ...interface{}) {
-	c.Info(data...)
-}
-
-func (c *Console) Debug(data ...interface{}) {
-	c.vm.Logger().Debug(data...)
-}
-
-func (c *Console) DebugF(format string, data ...interface{}) {
-	c.vm.Logger().DebugF(format, data...)
-}
-
-func (c *Console) Info(data ...interface{}) {
+	if c.hookFunc != nil {
+		c.hookFunc(data...)
+		return
+	}
 	c.vm.Logger().Info(data...)
-}
-
-func (c *Console) InfoF(format string, data ...interface{}) {
-	c.vm.Logger().InfoF(format, data...)
-}
-
-func (c *Console) Warn(data ...interface{}) {
-	c.vm.Logger().Warn(data...)
-}
-
-func (c *Console) WarnF(format string, data ...interface{}) {
-	c.vm.Logger().WarnF(format, data...)
-}
-
-func (c *Console) Error(data ...interface{}) {
-	c.vm.Logger().Error(data...)
-}
-
-func (c *Console) ErrorF(format string, data ...interface{}) {
-	c.vm.Logger().ErrorF(format, data...)
 }

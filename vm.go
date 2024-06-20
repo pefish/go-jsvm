@@ -26,6 +26,8 @@ type WrappedVm struct {
 	Vm     *goja.Runtime
 	script string
 	logger go_logger.InterfaceLogger
+
+	ConsoleModule *console.Console
 }
 
 type MainFuncType func([]interface{}) interface{}
@@ -81,15 +83,17 @@ func (v *WrappedVm) registerModules() {
 
 	v.RegisterModule(regex.ModuleName, regex.NewRegexModule(v))
 
-	v.RegisterModule(math.ModuleName, math.NewMathModule(v))
-	v.RegisterModule(math.ModuleName1, math.NewMathModule(v))
+	mathModule := math.NewMathModule(v)
+	v.RegisterModule(math.ModuleName, mathModule)
+	v.RegisterModule(math.ModuleName1, mathModule)
 
 	v.RegisterModule(time.ModuleName, time.NewTimeModule(v))
 
 	v.RegisterModule(http.ModuleName, http.NewHttpModule(v))
 
-	v.RegisterModule(console.ModuleName, console.NewConsoleModule(v))
-	v.RegisterModule(console.ModuleName1, console.NewConsoleModule(v))
+	v.ConsoleModule = console.NewConsoleModule(v)
+	v.RegisterModule(console.ModuleName, v.ConsoleModule)
+	v.RegisterModule(console.ModuleName1, v.ConsoleModule)
 }
 
 func (v *WrappedVm) RegisterModule(moduleName string, module interface{}) error {
