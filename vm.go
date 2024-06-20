@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+
+	raw_errors "errors"
 
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/buffer"
@@ -159,6 +162,9 @@ func (v *WrappedVm) RunMain(args []interface{}) (interface{}, error) {
 func (v *WrappedVm) Run() (goja.Value, error) {
 	value, err := v.Vm.RunString(v.script)
 	if err != nil {
+		if strings.Contains(err.Error(), "Killed") {
+			return nil, raw_errors.New("Killed")
+		}
 		return nil, errors.Wrapf(err, "Run script error.")
 	}
 	return value, nil
