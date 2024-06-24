@@ -3,7 +3,9 @@ package math
 import (
 	"math"
 
+	go_format "github.com/pefish/go-format"
 	"github.com/pefish/go-jsvm/module"
+	"github.com/pkg/errors"
 )
 
 const ModuleName = "Math"
@@ -30,6 +32,22 @@ func (c *Math) Average(values []float64) float64 {
 	// 计算总和
 	for _, v := range values {
 		sum += v
+	}
+
+	return sum / float64(count)
+}
+
+func (c *Math) AverageObjByKey(objs []map[string]interface{}, key string) float64 {
+	sum := 0.0
+	count := len(objs)
+
+	// 计算总和
+	for _, v := range objs {
+		f, err := go_format.FormatInstance.ToFloat64(v[key])
+		if err != nil {
+			c.vm.Panic(errors.Wrap(err, ""))
+		}
+		sum += f
 	}
 
 	return sum / float64(count)
