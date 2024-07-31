@@ -1,19 +1,19 @@
 package main
 
 import (
+	"log"
 	"os"
 	"time"
 
 	_ "github.com/dop251/goja_nodejs/console"
 	vm "github.com/pefish/go-jsvm"
 	"github.com/pefish/go-jsvm/_example/module/test_module"
-	go_logger "github.com/pefish/go-logger"
 )
 
 func main() {
 	err := do()
 	if err != nil {
-		go_logger.Logger.Error(err)
+		log.Fatal(err)
 	}
 }
 
@@ -24,7 +24,6 @@ func do() error {
 	if err != nil {
 		return err
 	}
-	wrappedVm.SetLogger(go_logger.Logger.CloneWithLevel("debug"))
 	err = wrappedVm.RegisterModule(test_module.ModuleName, test_module.NewTestModuleModule(wrappedVm))
 	if err != nil {
 		return err

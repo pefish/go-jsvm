@@ -13,31 +13,31 @@ import (
 	"github.com/dop251/goja_nodejs/process"
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/dop251/goja_nodejs/url"
+	i_logger "github.com/pefish/go-interface/i-logger"
 	"github.com/pefish/go-jsvm/module/console"
 	"github.com/pefish/go-jsvm/module/http"
 	"github.com/pefish/go-jsvm/module/math"
 	"github.com/pefish/go-jsvm/module/regex"
 	"github.com/pefish/go-jsvm/module/time"
-	go_logger "github.com/pefish/go-logger"
 	"github.com/pkg/errors"
 )
 
 type WrappedVm struct {
 	Vm     *goja.Runtime
 	script string
-	logger go_logger.InterfaceLogger
+	logger i_logger.ILogger
 
 	ConsoleModule *console.Console
 }
 
 type MainFuncType func([]interface{}) interface{}
 
-func (v *WrappedVm) SetLogger(logger go_logger.InterfaceLogger) *WrappedVm {
+func (v *WrappedVm) SetLogger(logger i_logger.ILogger) *WrappedVm {
 	v.logger = logger
 	return v
 }
 
-func (v *WrappedVm) Logger() go_logger.InterfaceLogger {
+func (v *WrappedVm) Logger() i_logger.ILogger {
 	return v.logger
 }
 
@@ -48,7 +48,7 @@ func NewVm(script string) *WrappedVm {
 	wrappedVm := &WrappedVm{
 		Vm:     vm,
 		script: script,
-		logger: go_logger.Logger,
+		logger: &i_logger.DefaultLogger,
 	}
 	wrappedVm.registerModules()
 	return wrappedVm
