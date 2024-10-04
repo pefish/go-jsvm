@@ -43,7 +43,7 @@ func (c *Math) AverageObjByKey(objs []map[string]interface{}, key string) float6
 
 	// 计算总和
 	for _, v := range objs {
-		f, err := go_format.FormatInstance.ToFloat64(v[key])
+		f, err := go_format.ToFloat64(v[key])
 		if err != nil {
 			c.vm.Panic(errors.Wrap(err, ""))
 		}
